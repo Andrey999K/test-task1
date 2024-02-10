@@ -7,17 +7,35 @@ const App = () => {
   const [currentSkill, setCurrentSkill] = useState<string | string[] | null>()
 
   const professions: Profession[] = data;
-  const skills: string[] = Array.from(new Set(professions.reduce((skills, profession) => [...skills, ...profession.mainSkills, ...profession.otherSkills],[])))
+  const [skills, setSkills] = useState<string[]>(Array.from(
+    new Set(professions.reduce(
+      (skills, profession) => [...skills, ...profession.mainSkills, ...profession.otherSkills],[])
+    )
+  ));
 
   const handlerSelectProfession = (profession: Profession) => {
+    const index = professions.findIndex(prof => prof.name === profession.name);
+    const skillsProfession = [...profession.mainSkills, ...profession.otherSkills];
+    console.log(professions.length, index, professions.length / index, Math.floor(skills.length / (professions.length / index)));
+    setSkills([
+      ...skills.slice(0, Math.floor(skills.length / (professions.length / index))).filter(skill => !skillsProfession.includes(skill)),
+      ...skillsProfession,
+      ...skills.slice(Math.floor(skills.length / (professions.length / index))).filter(skill => !skillsProfession.includes(skill))
+    ]);
+    // setSkills(prevState => [...prevState.slice(0, Math.floor(skills.length / (professions.length / index)))]);
     setCurrentSkill(null);
     setCurrentProfession(profession.name);
-    setCurrentSkill([...profession.mainSkills, ...profession.otherSkills]);
+    setCurrentSkill(skillsProfession);
   };
 
   const handlerSelectSkill = (skill: string) => {
     setCurrentProfession(null);
     setCurrentSkill(skill);
+    setCurrentProfession(
+      professions.filter(
+        prof => prof.otherSkills.includes(skill) || prof.mainSkills.includes(skill)
+      ).map(prof => prof.name)
+    );
   };
 
   const isCurrentItem = (item: string, type: "skill" | "profession") => {
@@ -35,14 +53,14 @@ const App = () => {
               key={index}
               className={`absolute top-[285px] right-[285px] flex justify-center items-center font-bold rounded-full w-7 h-7 ${isCurrentItem(item, "skill") ? "bg-[#FF7A00]" : "bg-[#FFD4AD]"} text-[#3A3A3A] cursor-pointer`}
               style={{
-                transform: `rotate(${360 / skills.length * (index + 1)}deg) translate(300px) rotate(-${360 / skills.length * (index + 1)}deg)`
+                transform: `rotate(${360 / skills.length * index}deg) translate(0, -300px) rotate(-${360 / skills.length * index}deg)`
               }}
               onClick={() => handlerSelectSkill(item)}
             >
               <span style={{
-              transform: `rotate(${360 / skills.length * (index + 1)}deg) translate(50px) rotate(-${360 / skills.length * (index + 1)}deg)`
+              transform: `rotate(${360 / skills.length * index}deg) translate(0, -50px) rotate(-${360 / skills.length * index}deg)`
             }}>
-              {item}
+              {item + "   " + index}
             </span>
             </div>
           ))}
@@ -55,14 +73,14 @@ const App = () => {
                 isCurrentItem(item.name, "profession") ? "bg-[#00A372]" : "bg-gray"
               } text-[#3A3A3A] cursor-pointer`}
               style={{
-                transform: `rotate(${360 / professions.length * (index + 1)}deg) translate(100px) rotate(-${360 / professions.length * (index + 1)}deg)`
+                transform: `rotate(${360 / professions.length * index}deg) translate(0, -100px) rotate(-${360 / professions.length * index}deg)`
               }}
               onClick={() => handlerSelectProfession(item)}
             >
             <span style={{
-              transform: `rotate(${360 / professions.length * (index + 1)}deg) translate(70px) rotate(-${360 / professions.length * (index + 1)}deg)`
+              transform: `rotate(${360 / professions.length * index}deg) translate(0, -70px) rotate(-${360 / professions.length * index}deg)`
             }}>
-              {item.name}
+              {item.name + "   " + index}
             </span>
             </div>
           ))}
