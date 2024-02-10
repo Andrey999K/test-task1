@@ -2,10 +2,11 @@
   "name": "test-task",
   "version": "1.0.0",
   "description": "test-task",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "start": "npx webpack serve --config webpack.config.dev.js",
-    "build": "npx webpack --config webpack.config.prod.js"
+    "build": "npx webpack --config webpack.config.prod.js",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -29,7 +30,9 @@
     "css-loader": "6.7.2",
     "css-minimizer-webpack-plugin": "4.2.2",
     "eslint-webpack-plugin": "^4.0.1",
+    "gh-pages": "^6.1.1",
     "html-webpack-plugin": "5.5.0",
+    "json-loader": "^0.5.7",
     "mini-css-extract-plugin": "2.6.1",
     "postcss": "8.4.31",
     "postcss-loader": "7.0.1",
