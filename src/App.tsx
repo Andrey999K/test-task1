@@ -16,13 +16,25 @@ const App = () => {
   const handlerSelectProfession = (profession: Profession) => {
     const index = professions.findIndex(prof => prof.name === profession.name);
     const skillsProfession = [...profession.mainSkills, ...profession.otherSkills];
-    console.log(professions.length, index, professions.length / index, Math.floor(skills.length / (professions.length / index)));
-    setSkills([
-      ...skills.slice(0, Math.floor(skills.length / (professions.length / index))).filter(skill => !skillsProfession.includes(skill)),
-      ...skillsProfession,
-      ...skills.slice(Math.floor(skills.length / (professions.length / index))).filter(skill => !skillsProfession.includes(skill))
-    ]);
-    // setSkills(prevState => [...prevState.slice(0, Math.floor(skills.length / (professions.length / index)))]);
+    const otherSkills = skills.filter(skill => !skillsProfession.includes(skill));
+    const firstPartEndIndex = Math.floor(360 / professions.length * index / (360 / skills.length)) - Math.ceil(skillsProfession.length / 2);
+    if (firstPartEndIndex < 0) {
+      const firstPartSkillProfession = skillsProfession.slice(Math.abs(firstPartEndIndex));
+      const secondPartSkillProfession = skillsProfession.slice(0, Math.abs(firstPartEndIndex));
+      setSkills([
+        ...firstPartSkillProfession,
+        ...otherSkills,
+        ...secondPartSkillProfession
+      ]);
+    } else {
+      const firstPart = otherSkills.slice(0, firstPartEndIndex);
+      const secondPart = otherSkills.slice(firstPart.length);
+      setSkills([
+        ...firstPart,
+        ...skillsProfession,
+        ...secondPart
+      ]);
+    }
     setCurrentSkill(null);
     setCurrentProfession(profession.name);
     setCurrentSkill(skillsProfession);
