@@ -12,6 +12,10 @@ body {
   background: #efefef;
 }
 
+.selected {
+  border: solid 1px #FF7A00;
+}
+
 #element1 {
   position: absolute;
   top: 100px;

@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { CSSProperties, useState } from "react";
 import data from "./data.json";
 import { Profession } from "./types";
-import gsap from "gsap";
 
 const App = () => {
   const [currentProfession, setCurrentProfession] = useState<string | string[] | null>();
@@ -14,7 +13,18 @@ const App = () => {
     )
   ));
 
-  const handlerSelectProfession = (profession: Profession) => {
+  const setStylesSelected = (elem: HTMLElement) => {
+    elem.style.top = "4px";
+    elem.style.right = "4px";
+    elem.style.bottom = "4px";
+    elem.style.left = "4px";
+    elem = elem.parentElement;
+    elem.style.border = `solid 1px ${elem.classList.contains("skill") ? "#FF7A00" : "#00A372"}`;
+  };
+
+  const handlerSelectProfession = (event: React.MouseEvent<HTMLDivElement>, profession: Profession) => {
+    resetStylesAllSelected();
+    setStylesSelected(event.currentTarget);
     const index = professions.findIndex(prof => prof.name === profession.name);
     const skillsProfession = [...profession.mainSkills, ...profession.otherSkills];
     const otherSkills = skills.filter(skill => !skillsProfession.includes(skill));
@@ -41,7 +51,17 @@ const App = () => {
     setCurrentSkill(skillsProfession);
   };
 
-  const handlerSelectSkill = (skill: string) => {
+  const resetStylesAllSelected = () => {
+    const elems = Array.from(document.querySelectorAll(".skill, .profession")) as HTMLElement[];
+    for (const elem of elems) {
+      elem.style.border = "";
+      elem.querySelector("div").style.inset = "";
+    }
+  };
+
+  const handlerSelectSkill = (event: React.MouseEvent<HTMLDivElement>, skill: string) => {
+    resetStylesAllSelected();
+    setStylesSelected(event.currentTarget);
     setCurrentSkill(skill);
     const profList = professions.filter(
       prof => prof.otherSkills.includes(skill) || prof.mainSkills.includes(skill)
@@ -68,12 +88,6 @@ const App = () => {
         ...secondPart
       ]);
     }
-    // console.log(index);
-    // console.log(360 / skills.length * index);
-    // console.log(Math.floor(professions.length / skills.length * index));
-    // console.log("profList.length: ", profList.length);
-    // console.log(Math.ceil(profList.length / 2));
-    // console.log(Math.floor(professions.length / skills.length * index) - Math.ceil(profList.length / 2));
     setCurrentProfession(profList.map(prof => prof.name));
   };
 
@@ -85,7 +99,7 @@ const App = () => {
 
   return (
     <div className="w-full flex justify-center items-center min-h-screen text-[10px]">
-      <div className="relative flex justify-center items-center rounded-full border-2 border-solid border-gray w-[602px] h-[602px]">
+      <div className="relative flex justify-center items-center rounded-full border-2 border-solid border-gray w-[609px] h-[609px]">
         {/*<div className="absolute top-[63px] left-[131px]">*/}
         {/*  <svg xmlns="http://www.w3.org/2000/svg">*/}
         {/*    <path d="M0 0 Q 52.5 10, 95 80 T 170 130" fill="none" stroke="orange" strokeWidth="2"/>*/}
@@ -100,37 +114,41 @@ const App = () => {
           {skills.map((item, index) => (
             <div
               key={index}
-              className={`absolute top-[285px] right-[285px] flex justify-center items-center font-bold rounded-full w-7 h-7 ${isCurrentItem(item, "skill") ? "bg-orange" : "bg-[#FFD4AD]"} text-[#3A3A3A] cursor-pointer`}
+              className={`skill absolute top-[285px] right-[285px] flex justify-center items-center font-bold rounded-full w-[34px] h-[34px] ${isCurrentItem(item, "skill") ? "text-[#3A3A3A]" : "text-gray"}`}
               style={{
-                transform: `rotate(${360 / skills.length * index}deg) translate(0, -300px) rotate(-${360 / skills.length * index}deg)`
+                transform: `rotate(${360 / skills.length * index}deg) translate(0, -303px) rotate(-${360 / skills.length * index}deg)`
               }}
-              onClick={() => handlerSelectSkill(item)}
             >
+              <div
+                className={`absolute inset-[5px] rounded-full ${isCurrentItem(item, "skill") ? "bg-orange" : "bg-[#FFD4AD]"} cursor-pointer`}
+                onClick={(e) => handlerSelectSkill(e, item)}
+              ></div>
               <span style={{
               transform: `rotate(${360 / skills.length * index}deg) translate(0, -50px) rotate(-${360 / skills.length * index}deg)`
             }}>
-              {item + "   " + index}
-            </span>
+                {item}
+              </span>
             </div>
           ))}
         </div>
-        <div className="relative border-2 border-solid border-gray rounded-full w-[203px] h-[203px]">
+        <div className="relative border-2 border-solid border-gray rounded-full w-[210px] h-[210px]">
           {professions.map((item, index) => (
             <div
               key={index}
-              className={`absolute top-[87px] right-[85px] flex justify-center items-center font-bold rounded-full w-7 h-7 ${
-                isCurrentItem(item.name, "profession") ? "bg-[#00A372]" : "bg-gray"
-              } text-[#3A3A3A] cursor-pointer`}
+              className={`profession absolute top-[87px] right-[85px] flex justify-center items-center font-bold rounded-full w-[34px] h-[34px] text-[#3A3A3A] cursor-pointer`}
               style={{
-                transform: `rotate(${360 / professions.length * index}deg) translate(0, -100px) rotate(-${360 / professions.length * index}deg)`
+                transform: `rotate(${360 / professions.length * index}deg) translate(0, -104px) rotate(-${360 / professions.length * index}deg)`
               }}
-              onClick={() => handlerSelectProfession(item)}
             >
-            <span style={{
-              transform: `rotate(${360 / professions.length * index}deg) translate(0, -70px) rotate(-${360 / professions.length * index}deg)`
-            }}>
-              {item.name + "   " + index}
-            </span>
+              <div
+                className={`absolute inset-[5px] rounded-full ${isCurrentItem(item.name, "profession") ? "bg-[#00A372]" : "bg-gray"} cursor-pointer`}
+                onClick={(e) => handlerSelectProfession(e, item)}
+              ></div>
+              <span style={{
+                transform: `rotate(${360 / professions.length * index}deg) translate(0, -70px) rotate(-${360 / professions.length * index}deg)`
+              }}>
+                {item.name}
+              </span>
             </div>
           ))}
         </div>
